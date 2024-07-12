@@ -3,7 +3,7 @@
 ## Stage 0: Install apline linux + node +dependencies 
 FROM node:18@sha256:7ce8b205d15e30fd395e5fa4000bcdf595fcff3f434fe75822e54e82a5f5cf82 AS dependencies
 
-LABEL maintainer="Melanie Le<thmle@myseneca.ca>" \
+LABEL maintainer="Maryam Najibi<snajibi@myseneca.ca>" \
       description="Fragments-ui Parcel web application"
 
 # Reduce npm spam when installing within Docker
