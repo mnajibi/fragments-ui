@@ -1,7 +1,18 @@
 // src/app.js
 
 import { Auth, getUser } from './auth';
-import { getUserFragments , createFragment} from './api';
+import { getUserFragments , createFragment, getFragmentData} from './api';
+import { ConsoleLogger } from "@aws-amplify/core";
+
+function createFragmentList(user, fragments) {
+  var list = document.createElement("ul");
+  fragments.forEach(async (d) => {
+    let li = document.createElement("li");
+    li.innerHTML = `Id: ${d.id}, Created: ${d.created}`;
+    list.append(li);
+  });
+  return list;
+}
 
 async function init() {
   // Get our UI elements
@@ -10,8 +21,7 @@ async function init() {
   const logoutBtn = document.querySelector('#logout');
   const fragmentForm = document.querySelector('#fragmentForm');
   const formSection = document.querySelector("#form");
-  const inputData = document.querySelector("#fragmentData");
-  const formSubmitBtn = document.querySelector('#formButton')
+  const listFragment = document.querySelector("#listFragment");
 
   // Wire up event handlers to deal with login and logout.
   loginBtn.onclick = () => {
@@ -34,18 +44,32 @@ async function init() {
   }
 
   // Do an authenticated request to the fragments API server and log the result
-  const userFragments = await getUserFragments(user);
+  getUserFragments(user);
+  let responseGetUserFragments = await getUserFragments(user);
 
   // Log the user info for debugging purposes
   console.log({ user });
 
   // Update the UI to welcome the user
   userSection.hidden = false;
+  listFragment.hidden = false;
+  formSection.hidden = false;
+
 
   // Show the user's username
   userSection.querySelector('.username').innerText = user.username;
 
-  formSection.hidden = false;
+  // show user's fragment
+  if (responseGetUserFragments.status == "ok") {
+    const fragments = responseGetUserFragments.fragments;
+    if (fragments.length > 0) {
+      const ul = createFragmentList(user, fragments);
+      listFragment.append(ul);
+    }
+  } else {
+    listFragment.innerHTML = "<p>Error loading Fragments data for user</p>"; 
+  }
+
 
   // Disable the Login button
   loginBtn.disabled = true;

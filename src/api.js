@@ -11,7 +11,7 @@ const apiUrl = process.env.API_URL || 'http://localhost:8080';
 export async function getUserFragments(user) {
   console.log('Requesting user fragments data...');
   try {
-    const res = await fetch(`${apiUrl}/v1/fragments`, {
+    const res = await fetch(`${apiUrl}/v1/fragments?expand=1`, {
       // Generate headers with the proper Authorization bearer token to pass.
       // We are using the `authorizationHeaders()` helper method we defined
       // earlier, to automatically attach the user's ID token.
@@ -30,7 +30,7 @@ export async function getUserFragments(user) {
 
 export async function createFragment(user, fragmentData){
   console.log("Start creating fragment");
-  console.log("data", fragmentData);
+  console.log("Fragment data received: ", fragmentData);
 
   try {
     const res = await fetch(`${apiUrl}/v1/fragments`, {
@@ -48,7 +48,7 @@ export async function createFragment(user, fragmentData){
     }
 
     const responseData = await res.json();
-    console.log('new user created', {responseData});
+    console.log('new fragment data created', {responseData});
   } catch (err) {
     console.error("Unable to call POST /v1/fragments", {err});
   }
