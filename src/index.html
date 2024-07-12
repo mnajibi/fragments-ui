@@ -17,13 +17,58 @@
     </section>
     <section hidden id="listFragment">
       <h2>List of Fragment</h2>
-      <ul></ul>
     </section>
     <section hidden id="form">
       <h2>Create new Fragment</h2>
       <form action="" method="post" id="fragmentForm">
-        <input name="fragmentData" id="fragmentData" type="text"/>
-        <input type="submit" value="submit"/>
+        <div>
+          <label>
+            <input
+              type="radio"
+              name="fragmentType"
+              value="text/plain"
+              required
+            />
+            text/plain</label
+          ><br />
+          <label
+            ><input
+              type="radio"
+              name="fragmentType"
+              value="text/markdown"
+              required
+            />
+            text/markdown</label
+          ><br />
+          <label
+            ><input
+              type="radio"
+              name="fragmentType"
+              value="text/html"
+              required
+            />
+            text/html</label
+          ><br />
+          <label
+            ><input
+              type="radio"
+              name="fragmentType"
+              value="application/json"
+              required
+            />
+            application/json</label
+          ><br />
+        </div>
+        <div>
+          <input
+            type="file"
+            id="input-file"
+            accept="text/plain,text/markdown,text/html, application/json"
+            name="fragmentFile"
+            required
+          />
+        </div>
+        <input type="submit" value="Submit" />
       </form>
     </section>
   </body>

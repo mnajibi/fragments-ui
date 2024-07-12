@@ -1,18 +1,34 @@
 // src/app.js
 
 import { Auth, getUser } from './auth';
-import { getUserFragments , createFragment, getFragmentData} from './api';
-import { ConsoleLogger } from "@aws-amplify/core";
+import { getUserFragments , createFragment} from './api';
 
 function createFragmentList(user, fragments) {
-  var list = document.createElement("ul");
+  var list = document.createElement("ol");
   fragments.forEach(async (d) => {
     let li = document.createElement("li");
-    li.innerHTML = `Id: ${d.id}, Created: ${d.created}`;
+    li.innerHTML = `Id: ${d.id}  <br/>  Created: ${new Date(d.created).toDateString()} <br/> Type: ${d.type} `;
     list.append(li);
   });
   return list;
 }
+
+
+async function displayUserFragmentList(user, listFragment) {
+  let responseGetUserFragments = await getUserFragments(user);
+  var listFragmentDiv = listFragment.querySelector("div");
+  listFragmentDiv.innerHTML = "";
+  if (responseGetUserFragments.status == "ok") {
+    const fragments = responseGetUserFragments.fragments;
+    if (fragments.length > 0) {
+      const ul = createFragmentList(fragments);
+      listFragmentDiv.append(ul);
+    }
+  } else {
+    listFragmentDiv.innerHTML = "<p>Error loading Fragments data for user</p>";
+  }
+}
+
 
 async function init() {
   // Get our UI elements
@@ -45,7 +61,6 @@ async function init() {
 
   // Do an authenticated request to the fragments API server and log the result
   getUserFragments(user);
-  let responseGetUserFragments = await getUserFragments(user);
 
   // Log the user info for debugging purposes
   console.log({ user });
@@ -60,26 +75,22 @@ async function init() {
   userSection.querySelector('.username').innerText = user.username;
 
   // show user's fragment
-  if (responseGetUserFragments.status == "ok") {
-    const fragments = responseGetUserFragments.fragments;
-    if (fragments.length > 0) {
-      const ul = createFragmentList(user, fragments);
-      listFragment.append(ul);
-    }
-  } else {
-    listFragment.innerHTML = "<p>Error loading Fragments data for user</p>"; 
-  }
+  await displayUserFragmentList(user, listFragment);
 
 
   // Disable the Login button
   loginBtn.disabled = true;
 
-  fragmentForm.onsubmit = (event) => {
+  fragmentForm.onsubmit = async (event) => {
     event.preventDefault();
     console.log("Form submit");
-    console.log(event.target.fragmentData.value);
-    const data = event.target.fragmentData.value;
-    createFragment(user, data);
+    let contentType = event.target.fragmentType.value;
+    let data = event.target.fragmentFile.files[0];
+    console.log("Content type: " + contentType);
+    console.log("data: " + data);
+    await createFragment(user, data, contentType);
+    fragmentForm.reset();
+    await displayUserFragmentList(user, listFragment);
   }
 }
 

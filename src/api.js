@@ -28,7 +28,7 @@ export async function getUserFragments(user) {
   }
 }
 
-export async function createFragment(user, fragmentData){
+export async function createFragment(user, fragmentData, contentType){
   console.log("Start creating fragment");
   console.log("Fragment data received: ", fragmentData);
 
@@ -38,7 +38,7 @@ export async function createFragment(user, fragmentData){
       headers: {
         // include user's id token in the request to be authorized
         Authorization: `Bearer ${user.idToken}`,
-        'Content-Type': 'text/plain'
+        'Content-Type': contentType,
       },
       body: fragmentData
     });
