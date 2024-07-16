@@ -1,9 +1,9 @@
 // src/app.js
 
 import { Auth, getUser } from './auth';
-import { getUserFragments , createFragment} from './api';
+import { getUserFragments, createFragment } from './api';
 
-function createFragmentList(user, fragments) {
+function createFragmentList(fragments) {
   var list = document.createElement("ol");
   fragments.forEach(async (d) => {
     let li = document.createElement("li");
@@ -13,12 +13,11 @@ function createFragmentList(user, fragments) {
   return list;
 }
 
-
 async function displayUserFragmentList(user, listFragment) {
   let responseGetUserFragments = await getUserFragments(user);
   var listFragmentDiv = listFragment.querySelector("div");
   listFragmentDiv.innerHTML = "";
-  if (responseGetUserFragments.status == "ok") {
+  if (responseGetUserFragments.status === "ok") {
     const fragments = responseGetUserFragments.fragments;
     if (fragments.length > 0) {
       const ul = createFragmentList(fragments);
@@ -29,8 +28,8 @@ async function displayUserFragmentList(user, listFragment) {
   }
 }
 
-
 async function init() {
+  console.log("init got called");
   // Get our UI elements
   const userSection = document.querySelector('#user');
   const loginBtn = document.querySelector('#login');
@@ -41,26 +40,21 @@ async function init() {
 
   // Wire up event handlers to deal with login and logout.
   loginBtn.onclick = () => {
-    // Sign-in via the Amazon Cognito Hosted UI (requires redirects), see:
-    // https://docs.amplify.aws/lib/auth/advanced/q/platform/js/#identity-pool-federation
     Auth.federatedSignIn();
   };
   logoutBtn.onclick = () => {
-    // Sign-out of the Amazon Cognito Hosted UI (requires redirects), see:
-    // https://docs.amplify.aws/lib/auth/emailpassword/q/platform/js/#sign-out
     Auth.signOut();
   };
 
   // See if we're signed in (i.e., we'll have a `user` object)
   const user = await getUser();
   if (!user) {
-    // Disable the Logout button
     logoutBtn.disabled = true;
     return;
   }
 
   // Do an authenticated request to the fragments API server and log the result
-  getUserFragments(user);
+  await getUserFragments(user);
 
   // Log the user info for debugging purposes
   console.log({ user });
@@ -70,13 +64,11 @@ async function init() {
   listFragment.hidden = false;
   formSection.hidden = false;
 
-
   // Show the user's username
   userSection.querySelector('.username').innerText = user.username;
 
-  // show user's fragment
-  await displayUserFragmentList(user, listFragment);
-
+  // Show user's fragments
+  //await displayUserFragmentList(user, listFragment);
 
   // Disable the Login button
   loginBtn.disabled = true;
@@ -88,11 +80,17 @@ async function init() {
     let data = event.target.fragmentFile.files[0];
     console.log("Content type: " + contentType);
     console.log("data: " + data);
-    await createFragment(user, data, contentType);
+
+    // Use FormData to handle file upload
+    const formData = new FormData();
+    formData.append("fragmentFile", data);
+    formData.append("fragmentType", contentType);
+
+    await createFragment(user, formData, contentType);
     fragmentForm.reset();
     await displayUserFragmentList(user, listFragment);
   }
 }
 
 // Wait for the DOM to be ready, then start the app
-addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', init);

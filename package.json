@@ -5,7 +5,7 @@
   "description": "Fragments UI testing web app",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel src/index.html",
+    "start": "rm -rf .parcel-cache && parcel src/index.html",
     "build": "parcel build src/index.html",
     "prettier": "npx prettier --write .",
     "lint": "npx eslint src/*"
